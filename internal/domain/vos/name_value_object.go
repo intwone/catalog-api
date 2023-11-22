@@ -1,6 +1,10 @@
 package vos
 
-import "github.com/intwone/catalog/internal/domain/errs"
+import (
+	"regexp"
+
+	"github.com/intwone/catalog/internal/domain/errs"
+)
 
 type Name struct {
 	Value string
@@ -36,5 +40,7 @@ func (n *Name) isTooLong() bool {
 }
 
 func (n *Name) invalidCharacters() bool {
-	return false
+	nameRegex := `[\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]`
+	match, _ := regexp.MatchString(nameRegex, n.Value)
+	return match
 }
