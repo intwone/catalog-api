@@ -10,4 +10,5 @@ var (
 	CannotActiveCategoryError   = errors.New("cannot activate category that is already active")
 	CannotDeactiveCategoryError = errors.New("cannot deactivate category that is already deactive")
 	ResourceNotFound            = errors.New("resource not found")
+	UnexpectedError             = errors.New("unexpected error")
 )

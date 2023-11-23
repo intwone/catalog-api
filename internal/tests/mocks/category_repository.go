@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 	entities "github.com/intwone/catalog/internal/domain/entities"
 )
 
@@ -34,8 +35,22 @@ func (m *MockCategoryRepositoryInterface) EXPECT() *MockCategoryRepositoryInterf
 	return m.recorder
 }
 
+// DeleteByID mocks base method.
+func (m *MockCategoryRepositoryInterface) DeleteByID(id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteByID", id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteByID indicates an expected call of DeleteByID.
+func (mr *MockCategoryRepositoryInterfaceMockRecorder) DeleteByID(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByID", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).DeleteByID), id)
+}
+
 // GetByID mocks base method.
-func (m *MockCategoryRepositoryInterface) GetByID(id string) (*entities.Category, error) {
+func (m *MockCategoryRepositoryInterface) GetByID(id uuid.UUID) (*entities.Category, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", id)
 	ret0, _ := ret[0].(*entities.Category)
