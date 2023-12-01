@@ -7,11 +7,11 @@ import (
 	"github.com/intwone/catalog/internal/domain/repositories"
 )
 
-type DeleteCategoryByIDInput struct {
+type DeactiveCategoryByIDInput struct {
 	ID string
 }
 
-type DeleteCategoryByIDOutput struct {
+type DeactiveCategoryByIDOutput struct {
 	ID          string
 	Name        string
 	Description string
@@ -19,30 +19,31 @@ type DeleteCategoryByIDOutput struct {
 	CreatedAt   time.Time
 }
 
-type DeleteCategoryByIDUseCaseInterface interface {
-	Execute(input DeleteCategoryByIDInput) (*DeleteCategoryByIDOutput, error)
+type DeactiveCategoryByIDUseCaseInterface interface {
+	Execute(input DeactiveCategoryByIDInput) (*DeactiveCategoryByIDOutput, error)
 }
 
-type DeleteCategoryByIDUseCase struct {
+type DeactiveCategoryByIDUseCase struct {
 	CategoryRepository repositories.CategoryRepositoryInterface
 }
 
-func NewDeleteCategoryByIDUseCase(cr repositories.CategoryRepositoryInterface) *DeleteCategoryByIDUseCase {
-	return &DeleteCategoryByIDUseCase{
+func NewDeactiveCategoryByIDUseCase(cr repositories.CategoryRepositoryInterface) *DeactiveCategoryByIDUseCase {
+	return &DeactiveCategoryByIDUseCase{
 		CategoryRepository: cr,
 	}
 }
 
-func (uc *DeleteCategoryByIDUseCase) Execute(input DeleteCategoryByIDInput) (*DeleteCategoryByIDOutput, error) {
+func (uc *DeactiveCategoryByIDUseCase) Execute(input DeactiveCategoryByIDInput) (*DeactiveCategoryByIDOutput, error) {
 	category, getCategoryRepositoryErr := uc.CategoryRepository.GetByID(input.ID)
 	if err := errs.HandleRepositoryError(getCategoryRepositoryErr); err != nil {
 		return nil, err
 	}
-	deleteCategoryRepositoryErr := uc.CategoryRepository.DeleteByID(input.ID)
-	if err := errs.HandleRepositoryError(deleteCategoryRepositoryErr); err != nil {
+	category.SetIsActive(false)
+	updateCategoryRepositoryErr := uc.CategoryRepository.Update(*category)
+	if err := errs.HandleRepositoryError(updateCategoryRepositoryErr); err != nil {
 		return nil, err
 	}
-	return &DeleteCategoryByIDOutput{
+	return &DeactiveCategoryByIDOutput{
 		ID:          category.GetID().String(),
 		Name:        category.GetName(),
 		Description: category.GetDescription(),

@@ -3,6 +3,7 @@ package use_cases
 import (
 	"time"
 
+	"github.com/intwone/catalog/internal/application/errs"
 	"github.com/intwone/catalog/internal/domain/entities"
 	"github.com/intwone/catalog/internal/domain/repositories"
 )
@@ -41,8 +42,8 @@ func (uc *CreateCategoryUseCase) Execute(input CreateCategoryInput) (*CreateCate
 		return nil, categoryErr
 	}
 	categoryRepositoryErr := uc.CategoryRepository.Save(*category)
-	if categoryRepositoryErr != nil {
-		return nil, categoryRepositoryErr
+	if err := errs.HandleRepositoryError(categoryRepositoryErr); err != nil {
+		return nil, err
 	}
 	return &CreateCategoryOutput{
 		ID:          category.GetID().String(),

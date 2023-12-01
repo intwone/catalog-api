@@ -34,8 +34,8 @@ func TestCreateCategoryUseCase_Execute(t *testing.T) {
 		// Assert
 		require.Nil(t, err)
 		require.NotNil(t, output.ID)
-		require.Equal(t, output.Name, categoryName)
-		require.Equal(t, output.Description, categoryDescription)
+		require.Equal(t, categoryName, output.Name)
+		require.Equal(t, categoryDescription, output.Description)
 		require.True(t, output.IsActive)
 		require.NotNil(t, output.CreatedAt)
 	})
@@ -60,6 +60,6 @@ func TestCreateCategoryUseCase_Execute(t *testing.T) {
 		// Assert
 		require.NotNil(t, err)
 		require.Nil(t, output)
-		require.Equal(t, err.Error(), errs.TooShortNameError.Error())
+		require.Equal(t, errs.TooShortNameError.Error(), err.Error())
 	})
 }

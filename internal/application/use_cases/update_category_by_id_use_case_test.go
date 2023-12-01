@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetCategoryByIDUseCase_Execute(t *testing.T) {
+func TestUpdateCategoryByIDUseCase_Execute(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	t.Run("should be able to get a category by id", func(t *testing.T) {
+	t.Run("should be able to update a category by id", func(t *testing.T) {
 		// Arange
 		categoryName := "category name"
 		categoryDescription := "category description"
@@ -23,42 +23,45 @@ func TestGetCategoryByIDUseCase_Execute(t *testing.T) {
 		category, _ := entities.NewCategory(categoryName, categoryDescription, categoryIsActive)
 		categoryRepository := mocks.NewMockCategoryRepositoryInterface(ctrl)
 		categoryRepository.EXPECT().GetByID(gomock.Any()).Return(category, nil).AnyTimes().Times(1)
-		useCase := uc.NewGetCategoryByIDUseCase(categoryRepository)
+		categoryRepository.EXPECT().Update(gomock.Any()).Return(nil).AnyTimes().Times(1)
+		useCase := uc.NewUpdateCategoryByIDUseCase(categoryRepository)
 
 		// Act
-		input := uc.GetCategoryByIDInput{
-			ID: category.GetID().String(),
+		input := uc.UpdateCategoryByIDInput{
+			ID:          category.GetID().String(),
+			Name:        "other category name",
+			Description: "other category description",
 		}
 		output, err := useCase.Execute(input)
 
 		// Assert
 		require.Nil(t, err)
-		require.NotNil(t, output.ID)
-		require.Equal(t, categoryName, output.Name)
-		require.Equal(t, categoryDescription, output.Description)
-		require.True(t, output.IsActive)
-		require.NotNil(t, output.CreatedAt)
+		require.Equal(t, "other category name", output.Name)
+		require.Equal(t, "other category description", output.Description)
 	})
 
-	t.Run("should not be able to get a category when id not exists", func(t *testing.T) {
+	t.Run("should not be able to update a category when inputs are invalids", func(t *testing.T) {
 		// Arange
 		categoryName := "category name"
 		categoryDescription := "category description"
 		categoryIsActive := true
 		category, _ := entities.NewCategory(categoryName, categoryDescription, categoryIsActive)
 		categoryRepository := mocks.NewMockCategoryRepositoryInterface(ctrl)
-		categoryRepository.EXPECT().GetByID(gomock.Any()).Return(nil, errs.ResourceNotFound).AnyTimes().Times(1)
-		useCase := uc.NewGetCategoryByIDUseCase(categoryRepository)
+		categoryRepository.EXPECT().GetByID(gomock.Any()).Return(category, nil).AnyTimes().Times(1)
+		categoryRepository.EXPECT().Update(gomock.Any()).Return(nil).AnyTimes().Times(0)
+		useCase := uc.NewUpdateCategoryByIDUseCase(categoryRepository)
 
 		// Act
-		input := uc.GetCategoryByIDInput{
-			ID: category.GetID().String(),
+		input := uc.UpdateCategoryByIDInput{
+			ID:          category.GetID().String(),
+			Name:        "",
+			Description: "other category description",
 		}
 		output, err := useCase.Execute(input)
 
 		// Assert
-		require.Nil(t, output)
 		require.NotNil(t, err)
-		require.Equal(t, errs.ResourceNotFound.Error(), err.Error())
+		require.Nil(t, output)
+		require.Equal(t, errs.TooShortNameError.Error(), err.Error())
 	})
 }

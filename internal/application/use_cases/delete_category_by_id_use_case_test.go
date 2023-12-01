@@ -22,12 +22,13 @@ func TestDeleteCategoryByIDUseCase_Execute(t *testing.T) {
 		categoryIsActive := true
 		category, _ := entities.NewCategory(categoryName, categoryDescription, categoryIsActive)
 		categoryRepository := mocks.NewMockCategoryRepositoryInterface(ctrl)
+		categoryRepository.EXPECT().GetByID(gomock.Any()).Return(category, nil).AnyTimes().Times(1)
 		categoryRepository.EXPECT().DeleteByID(gomock.Any()).Return(nil).AnyTimes().Times(1)
 		useCase := uc.NewDeleteCategoryByIDUseCase(categoryRepository)
 
 		// Act
 		input := uc.DeleteCategoryByIDInput{
-			ID: category.GetID(),
+			ID: category.GetID().String(),
 		}
 		_, err := useCase.Execute(input)
 
@@ -42,17 +43,18 @@ func TestDeleteCategoryByIDUseCase_Execute(t *testing.T) {
 		categoryIsActive := true
 		category, _ := entities.NewCategory(categoryName, categoryDescription, categoryIsActive)
 		categoryRepository := mocks.NewMockCategoryRepositoryInterface(ctrl)
-		categoryRepository.EXPECT().DeleteByID(gomock.Any()).Return(errs.ResourceNotFound).AnyTimes().Times(1)
+		categoryRepository.EXPECT().GetByID(gomock.Any()).Return(nil, errs.ResourceNotFound).AnyTimes().Times(1)
+		categoryRepository.EXPECT().DeleteByID(gomock.Any()).Return(errs.ResourceNotFound).AnyTimes().Times(0)
 		useCase := uc.NewDeleteCategoryByIDUseCase(categoryRepository)
 
 		// Act
 		input := uc.DeleteCategoryByIDInput{
-			ID: category.GetID(),
+			ID: category.GetID().String(),
 		}
 		_, err := useCase.Execute(input)
 
 		// Assert
 		require.NotNil(t, err)
-		require.Equal(t, err.Error(), errs.ResourceNotFound.Error())
+		require.Equal(t, errs.ResourceNotFound.Error(), err.Error())
 	})
 }
