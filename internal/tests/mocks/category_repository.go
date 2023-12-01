@@ -92,6 +92,21 @@ func (mr *MockCategoryRepositoryInterfaceMockRecorder) Save(category interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Save), category)
 }
 
+// Search mocks base method.
+func (m *MockCategoryRepositoryInterface) Search(offset, limit int64, keyword string) (*[]entities.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Search", offset, limit, keyword)
+	ret0, _ := ret[0].(*[]entities.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Search indicates an expected call of Search.
+func (mr *MockCategoryRepositoryInterfaceMockRecorder) Search(offset, limit, keyword interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Search), offset, limit, keyword)
+}
+
 // Update mocks base method.
 func (m *MockCategoryRepositoryInterface) Update(category entities.Category) error {
 	m.ctrl.T.Helper()

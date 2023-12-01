@@ -5,6 +5,7 @@ import (
 
 	"github.com/intwone/catalog/internal/domain/entities"
 	"github.com/intwone/catalog/internal/domain/errs"
+	"github.com/intwone/catalog/internal/infra/postgres/mappers"
 )
 
 type CategoryRepository struct {
@@ -28,39 +29,29 @@ func (r *CategoryRepository) Save(c entities.Category) error {
 
 func (r *CategoryRepository) Get() (*[]entities.Category, error) {
 	query := `select * from "categories" where is_active = true`
-	rows, err := r.db.Query(query)
-	if err != nil {
+	rows, queryErr := r.db.Query(query)
+	if queryErr != nil {
 		return nil, errs.UnexpectedError
 	}
 	defer rows.Close()
-	var categories []entities.Category
-	for rows.Next() {
-		var category entities.Category
-		if err := rows.Scan(
-			&category.ID,
-			&category.Name.Value,
-			&category.Description.Value,
-			&category.IsActive,
-			&category.CreatedAt,
-			&category.UpdatedAt,
-		); err != nil {
-			return nil, errs.UnexpectedError
-		}
-		categories = append(categories, category)
+	categories, mapperErr := mappers.InfraToDomain(rows)
+	if mapperErr != nil {
+		return nil, errs.UnexpectedError
 	}
-	return &categories, nil
+	return categories, nil
 }
 
 func (r *CategoryRepository) GetByID(id string) (*entities.Category, error) {
 	query := `select * from "categories" where category_id = $1 and is_active = true`
-	rows, err := r.db.Query(query, id)
-	if err != nil {
+	rows, queryErr := r.db.Query(query, id)
+	if queryErr != nil {
 		return nil, errs.UnexpectedError
 	}
 	var category entities.Category
 	if rows.Next() {
-		if err := rows.Scan(&category.ID, &category.Name.Value, &category.Description.Value, &category.IsActive, &category.CreatedAt, &category.UpdatedAt); err != nil {
-			return nil, err
+		scanErr := rows.Scan(&category.ID, &category.Name.Value, &category.Description.Value, &category.IsActive, &category.CreatedAt, &category.UpdatedAt)
+		if scanErr != nil {
+			return nil, errs.UnexpectedError
 		}
 	} else {
 		return nil, errs.ResourceNotFound
@@ -92,4 +83,18 @@ func (r *CategoryRepository) Update(category entities.Category) error {
 		return errs.ResourceNotFound
 	}
 	return nil
+}
+
+func (r *CategoryRepository) Search(offset int64, limit int64, keyword string) (*[]entities.Category, error) {
+	query := `select * from "categories" where is_active = true and (name ilike '%' || $1 || '%' or description ilike '%' || $1 || '%') limit $2 offset $3`
+	rows, queryErr := r.db.Query(query, keyword, limit, offset)
+	if queryErr != nil {
+		return nil, errs.UnexpectedError
+	}
+	defer rows.Close()
+	categories, mapperErr := mappers.InfraToDomain(rows)
+	if mapperErr != nil {
+		return nil, errs.UnexpectedError
+	}
+	return categories, nil
 }

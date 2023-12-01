@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func cleanup() {
-	_, err := sqlDB.Exec("DELETE FROM categories")
+	_, err := sqlDB.Exec("delete from categories")
 	if err != nil {
 		panic(err)
 	}
@@ -201,6 +201,131 @@ func TestCategoryRepository_Update(t *testing.T) {
 		// Assert
 		require.NotNil(t, err)
 		require.Equal(t, errs.ResourceNotFound.Error(), err.Error())
+		defer cleanup()
+	})
+}
+
+func TestCategoryRepository_Search(t *testing.T) {
+	t.Run("should search a category", func(t *testing.T) {
+		// Arrange
+		category1, _ := entities.NewCategory("comedy category", "description comedy", true)
+		category2, _ := entities.NewCategory("horror category", "description horror", true)
+		category3, _ := entities.NewCategory("drama category", "description drama", true)
+		category4, _ := entities.NewCategory("science fiction category", "description science", true)
+		category5, _ := entities.NewCategory("war category", "description war", true)
+		category6, _ := entities.NewCategory("action category", "description action", true)
+		category7, _ := entities.NewCategory("romantic comedy category", "description romantic comedy", true)
+		categoryRepository := NewCategoryRepository(sqlDB)
+		categoryRepository.Save(*category1)
+		categoryRepository.Save(*category2)
+		categoryRepository.Save(*category3)
+		categoryRepository.Save(*category4)
+		categoryRepository.Save(*category5)
+		categoryRepository.Save(*category6)
+		categoryRepository.Save(*category7)
+
+		// Act
+		result, err := categoryRepository.Search(0, 3, "")
+
+		// Assert
+		require.Nil(t, err)
+		require.NotNil(t, result)
+		require.Equal(t, 3, len(*result))
+		require.Equal(t, category1.GetName(), (*result)[0].GetName())
+		require.Equal(t, category2.GetName(), (*result)[1].GetName())
+		require.Equal(t, category3.GetName(), (*result)[2].GetName())
+		defer cleanup()
+	})
+
+	t.Run("should search a category by name", func(t *testing.T) {
+		// Arrange
+		category1, _ := entities.NewCategory("comedy category", "description comedy", true)
+		category2, _ := entities.NewCategory("horror category", "description horror", true)
+		category3, _ := entities.NewCategory("drama category", "description drama", true)
+		category4, _ := entities.NewCategory("science fiction category", "description science", true)
+		category5, _ := entities.NewCategory("war category", "description war", true)
+		category6, _ := entities.NewCategory("action category", "description action", true)
+		category7, _ := entities.NewCategory("romantic comedy category", "description romantic comedy", true)
+		categoryRepository := NewCategoryRepository(sqlDB)
+		categoryRepository.Save(*category1)
+		categoryRepository.Save(*category2)
+		categoryRepository.Save(*category3)
+		categoryRepository.Save(*category4)
+		categoryRepository.Save(*category5)
+		categoryRepository.Save(*category6)
+		categoryRepository.Save(*category7)
+
+		// Act
+		result, err := categoryRepository.Search(0, 3, "comedy")
+
+		// Assert
+		require.Nil(t, err)
+		require.NotNil(t, result)
+		require.Equal(t, 2, len(*result))
+		require.Equal(t, category1.GetName(), (*result)[0].GetName())
+		require.Equal(t, category7.GetName(), (*result)[1].GetName())
+		defer cleanup()
+	})
+
+	t.Run("should search a category by description and get only 3 result", func(t *testing.T) {
+		// Arrange
+		category1, _ := entities.NewCategory("comedy category", "description comedy test", true)
+		category2, _ := entities.NewCategory("horror category", "description horror test", true)
+		category3, _ := entities.NewCategory("drama category", "description drama test", true)
+		category4, _ := entities.NewCategory("science fiction category", "description science test", true)
+		category5, _ := entities.NewCategory("war category", "description war test", true)
+		category6, _ := entities.NewCategory("action category", "description action test", true)
+		category7, _ := entities.NewCategory("romantic comedy category", "description romantic comedy test", true)
+		categoryRepository := NewCategoryRepository(sqlDB)
+		categoryRepository.Save(*category1)
+		categoryRepository.Save(*category2)
+		categoryRepository.Save(*category3)
+		categoryRepository.Save(*category4)
+		categoryRepository.Save(*category5)
+		categoryRepository.Save(*category6)
+		categoryRepository.Save(*category7)
+
+		// Act
+		result, err := categoryRepository.Search(0, 3, "test")
+
+		// Assert
+		require.Nil(t, err)
+		require.NotNil(t, result)
+		require.Equal(t, 3, len(*result))
+		require.Equal(t, category1.GetName(), (*result)[0].GetName())
+		require.Equal(t, category2.GetName(), (*result)[1].GetName())
+		require.Equal(t, category3.GetName(), (*result)[2].GetName())
+		defer cleanup()
+	})
+
+	t.Run("should search a category by name and skip first 3 results", func(t *testing.T) {
+		// Arrange
+		category1, _ := entities.NewCategory("comedy category", "description comedy test", true)
+		category2, _ := entities.NewCategory("horror category", "description horror test", true)
+		category3, _ := entities.NewCategory("drama category", "description drama test", true)
+		category4, _ := entities.NewCategory("science fiction category", "description science test", true)
+		category5, _ := entities.NewCategory("war category", "description war test", true)
+		category6, _ := entities.NewCategory("action category", "description action test", true)
+		category7, _ := entities.NewCategory("romantic comedy category", "description romantic comedy test", true)
+		categoryRepository := NewCategoryRepository(sqlDB)
+		categoryRepository.Save(*category1)
+		categoryRepository.Save(*category2)
+		categoryRepository.Save(*category3)
+		categoryRepository.Save(*category4)
+		categoryRepository.Save(*category5)
+		categoryRepository.Save(*category6)
+		categoryRepository.Save(*category7)
+
+		// Act
+		result, err := categoryRepository.Search(3, 3, "test")
+
+		// Assert
+		require.Nil(t, err)
+		require.NotNil(t, result)
+		require.Equal(t, 3, len(*result))
+		require.Equal(t, category4.GetName(), (*result)[0].GetName())
+		require.Equal(t, category5.GetName(), (*result)[1].GetName())
+		require.Equal(t, category6.GetName(), (*result)[2].GetName())
 		defer cleanup()
 	})
 }
