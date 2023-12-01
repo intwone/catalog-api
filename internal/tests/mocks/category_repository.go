@@ -8,7 +8,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	uuid "github.com/google/uuid"
 	entities "github.com/intwone/catalog/internal/domain/entities"
 )
 
@@ -36,7 +35,7 @@ func (m *MockCategoryRepositoryInterface) EXPECT() *MockCategoryRepositoryInterf
 }
 
 // DeleteByID mocks base method.
-func (m *MockCategoryRepositoryInterface) DeleteByID(id uuid.UUID) error {
+func (m *MockCategoryRepositoryInterface) DeleteByID(id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByID", id)
 	ret0, _ := ret[0].(error)
@@ -49,8 +48,23 @@ func (mr *MockCategoryRepositoryInterfaceMockRecorder) DeleteByID(id interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByID", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).DeleteByID), id)
 }
 
+// Get mocks base method.
+func (m *MockCategoryRepositoryInterface) Get() (*[]entities.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get")
+	ret0, _ := ret[0].(*[]entities.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockCategoryRepositoryInterfaceMockRecorder) Get() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Get))
+}
+
 // GetByID mocks base method.
-func (m *MockCategoryRepositoryInterface) GetByID(id uuid.UUID) (*entities.Category, error) {
+func (m *MockCategoryRepositoryInterface) GetByID(id string) (*entities.Category, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", id)
 	ret0, _ := ret[0].(*entities.Category)
@@ -65,15 +79,29 @@ func (mr *MockCategoryRepositoryInterfaceMockRecorder) GetByID(id interface{}) *
 }
 
 // Save mocks base method.
-func (m *MockCategoryRepositoryInterface) Save(arg0 entities.Category) error {
+func (m *MockCategoryRepositoryInterface) Save(category entities.Category) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", arg0)
+	ret := m.ctrl.Call(m, "Save", category)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockCategoryRepositoryInterfaceMockRecorder) Save(arg0 interface{}) *gomock.Call {
+func (mr *MockCategoryRepositoryInterfaceMockRecorder) Save(category interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Save), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Save), category)
+}
+
+// Update mocks base method.
+func (m *MockCategoryRepositoryInterface) Update(category entities.Category) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", category)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockCategoryRepositoryInterfaceMockRecorder) Update(category interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCategoryRepositoryInterface)(nil).Update), category)
 }

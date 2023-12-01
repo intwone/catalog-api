@@ -23,44 +23,6 @@ func TestCategory(t *testing.T) {
 		require.True(t, category.GetIsActive())
 	})
 
-	t.Run("should be able active a category", func(t *testing.T) {
-		validName := "name test"
-		validDescription := "description test"
-		category, _ := entities.NewCategory(validName, validDescription, false)
-		result := category.Active()
-
-		require.Nil(t, result)
-		require.True(t, category.GetIsActive())
-	})
-
-	t.Run("should be able deactive a category", func(t *testing.T) {
-		validName := "name test"
-		validDescription := "description test"
-		category, _ := entities.NewCategory(validName, validDescription, true)
-		result := category.Deactive()
-
-		require.Nil(t, result)
-		require.False(t, category.GetIsActive())
-	})
-
-	t.Run("should not be able active a category that is already active", func(t *testing.T) {
-		validName := "name test"
-		validDescription := "description test"
-		category, _ := entities.NewCategory(validName, validDescription, true)
-		result := category.Active()
-
-		require.Equal(t, result.Error(), errs.CannotActiveCategoryError.Error())
-	})
-
-	t.Run("should not be able deactive a category that is already deactive", func(t *testing.T) {
-		validName := "name test"
-		validDescription := "description test"
-		category, _ := entities.NewCategory(validName, validDescription, false)
-		result := category.Deactive()
-
-		require.Equal(t, result.Error(), errs.CannotDeactiveCategoryError.Error())
-	})
-
 	t.Run("should not be able update category name with invalid name", func(t *testing.T) {
 		validName := "name test"
 		validDescription := "description test"

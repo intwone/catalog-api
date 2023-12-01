@@ -1,12 +1,18 @@
 package repositories
 
 import (
-	"github.com/google/uuid"
 	"github.com/intwone/catalog/internal/domain/entities"
 )
 
+type DataToUpdate struct {
+	Name        *string
+	Description *string
+}
+
 type CategoryRepositoryInterface interface {
-	Save(entities.Category) error
-	GetByID(id uuid.UUID) (*entities.Category, error)
-	DeleteByID(id uuid.UUID) error
+	Save(category entities.Category) error
+	Get() (*[]entities.Category, error)
+	GetByID(id string) (*entities.Category, error)
+	DeleteByID(id string) error
+	Update(category entities.Category) error
 }

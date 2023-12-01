@@ -4,18 +4,17 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/intwone/catalog/internal/domain/errs"
 	seedwork "github.com/intwone/catalog/internal/domain/seed-work"
 	"github.com/intwone/catalog/internal/domain/vos"
 )
 
 type Category struct {
 	seedwork.AggregateRoot
-	name        vos.Name
-	description vos.Description
-	isActive    bool
-	createdAt   time.Time
-	updatedAt   time.Time
+	Name        vos.Name
+	Description vos.Description
+	IsActive    bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func NewCategory(name string, description string, isActive bool) (*Category, error) {
@@ -29,34 +28,18 @@ func NewCategory(name string, description string, isActive bool) (*Category, err
 	}
 	return &Category{
 		AggregateRoot: seedwork.AggregateRoot{Entity: *seedwork.NewEntity()},
-		name:          *newName,
-		description:   *newDescription,
-		isActive:      isActive,
-		createdAt:     time.Now(),
-		updatedAt:     time.Now(),
+		Name:          *newName,
+		Description:   *newDescription,
+		IsActive:      isActive,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}, nil
 }
 
 // Methods
 
-func (c *Category) Active() error {
-	if c.isActive {
-		return errs.CannotActiveCategoryError
-	}
-	c.isActive = true
-	return nil
-}
-
-func (c *Category) Deactive() error {
-	if !c.isActive {
-		return errs.CannotDeactiveCategoryError
-	}
-	c.isActive = false
-	return nil
-}
-
 func (c *Category) update() {
-	c.updatedAt = time.Now()
+	c.UpdatedAt = time.Now()
 }
 
 // Getters
@@ -66,23 +49,23 @@ func (c *Category) GetID() uuid.UUID {
 }
 
 func (c *Category) GetName() string {
-	return c.name.Value
+	return c.Name.Value
 }
 
 func (c *Category) GetDescription() string {
-	return c.description.Value
+	return c.Description.Value
 }
 
 func (c *Category) GetIsActive() bool {
-	return c.isActive
+	return c.IsActive
 }
 
 func (c *Category) GetCreatedAt() time.Time {
-	return c.createdAt
+	return c.CreatedAt
 }
 
 func (c *Category) GetUpdatedAt() time.Time {
-	return c.updatedAt
+	return c.UpdatedAt
 }
 
 // Setters
@@ -93,7 +76,7 @@ func (c *Category) SetName(name string) error {
 		return err
 	}
 	c.update()
-	c.name = *newName
+	c.Name = *newName
 	return nil
 }
 
@@ -103,6 +86,11 @@ func (c *Category) SetDescription(description string) error {
 		return err
 	}
 	c.update()
-	c.description = *newDescription
+	c.Description = *newDescription
 	return nil
+}
+
+func (c *Category) SetIsActive(isActive bool) {
+	c.update()
+	c.IsActive = isActive
 }
